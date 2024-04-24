@@ -1,11 +1,11 @@
-# A* Routing Demo
-
-> [Demo](https://stefanhuber.github.io/osm-astar-demo/)
-
-## Usage
-
- - Install dependencies `npm i`
- - Extract a small section from OSM (e.g., via [openstreetmap.org](https://www.openstreetmap.org/export#map=14/47.5855/12.2242)) and save it as `map.osm` in the project folder
- - Generate the routing graph representation with `npm run graph`
- - Change the bounding box according the `<bounds>` from the osm file inside the `index.html` (line 40-41)
- - `npm run serve` for local deployment
+- npm install
+- lên open street map tải file xml về (bỏ qua bước này cũng được)
+- npm run graph để generate json
+- npm run serve
+******
+- osm-parser.js dùng để viết các hàm chuyển đổi, output trả ra các hàm lấy điểm, vẽ điểm, vẽ đường, tạo đồ thị
+- map.osm là file data lấy từ open street map về
+- index.js dùng để đọc file map.osm sử dụng các hàm mà osm-parser.js trả ra để tạo ra file map.json
+- a-star.js xử lý thuật toán a-star
+- map.json lấy dữ liệu cần thiết từ file map.osm
+- index.html hiển thị giao diện sử dụng leaflet và open street map

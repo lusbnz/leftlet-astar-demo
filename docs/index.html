@@ -23,7 +23,7 @@
         }
 
         #mapid {
-            height: 90vh;
+            height: 95vh;
         }
     </style>
 </head>
@@ -47,7 +47,7 @@
         let aid = -1;
         let bid = -1;
         let currentMap = 'MapboxSatellite';
-        const mymap = L.map('mapid').setView([21.0222, 105.8062], 16);
+        const mymap = L.map('mapid').setView([21.04069, 105.78959], 16);
         const line = L.polyline([], { color: 'red' }).addTo(mymap);
         const a = L.marker([0, 0]).addTo(mymap);
         const b = L.marker([1, 1]).addTo(mymap);

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Routing</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+    <script src="a-star.js"></script>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #mapid {
+            height: 90vh;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="mapid"></div>
+
+    <div id="data">
+        <div id="nodes">
+
+        </div>
+        <div style="display: flex; gap: 2px;">
+            <button id="toggle-nodes">Toggle Nodes</button>
+            <button id="toggle-map">Switch Map</button>
+        </div>
+    </div>
+
+    <script>
+        let ab = true;
+        let aid = -1;
+        let bid = -1;
+        let currentMap = 'MapboxSatellite';
+        const mymap = L.map('mapid').setView([21.0222, 105.8062], 16);
+        const line = L.polyline([], { color: 'red' }).addTo(mymap);
+        const a = L.marker([0, 0]).addTo(mymap);
+        const b = L.marker([1, 1]).addTo(mymap);
+
+        mymap.on('click', (e) => {
+            let nn = nearestNeighbour(e.latlng["lat"], e.latlng["lng"]);
+
+            if (ab) {
+                a.setLatLng(nn);
+                aid = nn.id;
+                ab = false;
+            } else {
+                b.setLatLng(nn);
+                bid = nn.id;
+                ab = true;
+            }
+
+            if (aid > 0 && bid > 0) {
+                let path = constructPath(astar(aid, bid));
+                line.setLatLngs(path);
+            }
+        });
+
+        function switchMap() {
+            if (currentMap === 'OpenStreetMap') {
+                currentMap = 'MapboxSatellite';
+                L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                    attribution: '',
+                    maxZoom: 18,
+                    id: 'mapbox/satellite-v9',
+                    tileSize: 512,
+                    zoomOffset: -1,
+                    accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA'
+                }).addTo(mymap);
+            } else {
+                currentMap = 'OpenStreetMap';
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '',
+                    maxZoom: 17,
+                    subdomains: "abc"
+                }).addTo(mymap);
+            }
+        }
+        document.getElementById('toggle-map').addEventListener('click', switchMap);
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            attribution: '',
+            maxZoom: 18,
+            id: 'mapbox/satellite-v9',
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA'
+        }).addTo(mymap);
+
+        fetch("map.json")
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem("data", JSON.stringify(data.nodes));
+
+                let l = 0;
+                for (let k in data.nodes) l++;
+
+                document.getElementById('nodes').textContent = `${l} nodes in the map`;
+
+                let circles = [];
+
+                for (let key in data.nodes) {
+                    if (data.nodes.hasOwnProperty(key)) circles.push(L.circle([data.nodes[key].lat, data.nodes[key].lon], { radius: 1 }));
+                }
+
+                let circlesLayer = L.layerGroup(circles);
+
+                document.getElementById('toggle-nodes').addEventListener('click', () => {
+                    if (mymap.hasLayer(circlesLayer)) {
+                        mymap.removeLayer(circlesLayer);
+                    } else {
+                        mymap.addLayer(circlesLayer);
+                    }
+                });
+            });
+
+
+        (() => {
+            let data = JSON.parse(localStorage.getItem('data'));
+
+            let circles = [];
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) circles.push(L.circle([data[key].lat, data[key].lon], { radius: 1 }));
+            }
+
+            let circlesLayer = L.layerGroup(circles);
+
+            document.getElementById('toggle-nodes').addEventListener('click', () => {
+                if (mymap.hasLayer(circlesLayer)) {
+                    mymap.removeLayer(circlesLayer);
+                } else {
+                    mymap.addLayer(circlesLayer);
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

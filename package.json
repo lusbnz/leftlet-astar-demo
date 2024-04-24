@@ -1,0 +1,11 @@
+{
+  "main": "index.js",
+  "scripts": {
+    "serve": "http-server docs -p 8080",
+    "graph": "node index.js"
+  },
+  "devDependencies": {
+    "http-server": "^0.12.3",
+    "xml2js": "^0.4.23"
+  }
+}

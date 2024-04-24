@@ -8,4 +8,4 @@
 - index.js dùng để đọc file map.osm sử dụng các hàm mà osm-parser.js trả ra để tạo ra file map.json
 - a-star.js xử lý thuật toán a-star
 - map.json lấy dữ liệu cần thiết từ file map.osm
-- index.html hiển thị giao diện sử dụng leaflet và open street map (ngoài ra có thể sử dụng open layer để tạo bản đồ)
+- index.html hiển thị giao diện sử dụng leaflet và open street map

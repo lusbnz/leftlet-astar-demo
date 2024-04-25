@@ -23,7 +23,7 @@
         }
 
         #mapid {
-            height: 95vh;
+            height: 97vh;
         }
     </style>
 </head>
@@ -32,13 +32,13 @@
 
     <div id="mapid"></div>
 
-    <div id="data">
-        <div id="nodes">
-
-        </div>
-        <div style="display: flex; gap: 2px;">
-            <button id="toggle-nodes">Toggle Nodes</button>
-            <button id="toggle-map">Switch Map</button>
+    <div id="data" style="display: flex; gap: 8px; padding-top: 4px;">
+        <div id="nodes"></div>
+        <button id="toggle-nodes">Toggle Nodes</button>
+        <button id="toggle-map">Switch Map</button>
+        <div id="search-container">
+            <input type="text" id="address-input" placeholder="Enter an address">
+            <button id="search-button">Search</button>
         </div>
     </div>
 
@@ -48,9 +48,9 @@
         let bid = -1;
         let currentMap = 'MapboxSatellite';
         const mymap = L.map('mapid').setView([21.04069, 105.78959], 16);
-        const line = L.polyline([], { color: 'red' }).addTo(mymap);
-        const a = L.marker([0, 0]).addTo(mymap);
-        const b = L.marker([1, 1]).addTo(mymap);
+        const line = L.polyline([], { color: 'red', weight: 5 }).addTo(mymap);
+        const a = L.marker([0, 0], { draggable: true }).addTo(mymap);
+        const b = L.marker([1, 1], { draggable: true }).addTo(mymap);
 
         mymap.on('click', (e) => {
             let nn = nearestNeighbour(e.latlng["lat"], e.latlng["lng"]);
@@ -69,6 +69,22 @@
                 let path = constructPath(astar(aid, bid));
                 line.setLatLngs(path);
             }
+        });
+
+        a.on('dragend', (e) => {
+            aid = null;
+            let nn = nearestNeighbour(e.target.getLatLng().lat, e.target.getLatLng().lng);
+            aid = nn.id;
+            let path = constructPath(astar(aid, bid));
+            line.setLatLngs(path);
+        });
+
+        b.on('dragend', (e) => {
+            bid = null;
+            let nn = nearestNeighbour(e.target.getLatLng().lat, e.target.getLatLng().lng);
+            bid = nn.id;
+            let path = constructPath(astar(aid, bid));
+            line.setLatLngs(path);
         });
 
         function switchMap() {

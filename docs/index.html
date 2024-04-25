@@ -10,9 +10,11 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
         crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
         integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
         crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script src="a-star.js"></script>
 
@@ -23,7 +25,7 @@
         }
 
         #mapid {
-            height: 97vh;
+            height: 100vh;
         }
     </style>
 </head>
@@ -31,16 +33,6 @@
 <body>
 
     <div id="mapid"></div>
-
-    <div id="data" style="display: flex; gap: 8px; padding-top: 4px;">
-        <div id="nodes"></div>
-        <button id="toggle-nodes">Toggle Nodes</button>
-        <button id="toggle-map">Switch Map</button>
-        <div id="search-container">
-            <input type="text" id="address-input" placeholder="Enter an address">
-            <button id="search-button">Search</button>
-        </div>
-    </div>
 
     <script>
         let ab = true;
@@ -51,6 +43,28 @@
         const line = L.polyline([], { color: 'red', weight: 5 }).addTo(mymap);
         const a = L.marker([0, 0], { draggable: true }).addTo(mymap);
         const b = L.marker([1, 1], { draggable: true }).addTo(mymap);
+        let currentPath = [];
+        let currentIndex = 0;
+
+        var geocoder = L.Control.Geocoder.mapbox('pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA');
+
+        var control = L.Control.geocoder({
+            geocoder: geocoder
+        }).addTo(mymap);
+
+        function renderPathPartially() {
+            if (currentIndex < currentPath.length) {
+                line.addLatLng(currentPath[currentIndex]);
+                currentIndex++;
+                setTimeout(renderPathPartially, 50);
+            }
+        }
+
+        function renderPathIncrementally(path) {
+            currentPath = path;
+            currentIndex = 0;
+            renderPathPartially();
+        }
 
         mymap.on('click', (e) => {
             let nn = nearestNeighbour(e.latlng["lat"], e.latlng["lng"]);
@@ -66,10 +80,18 @@
             }
 
             if (aid > 0 && bid > 0) {
-                let path = constructPath(astar(aid, bid));
-                line.setLatLngs(path);
+                line.setLatLngs([]);
+                let path = constructPath(astar(bid, aid));
+                renderPathIncrementally(path);
+
+                a.setLatLng([0, 0]);
+                b.setLatLng([1, 1]);
+                aid = -1;
+                bid = -1;
+                ab = true;
             }
         });
+
 
         a.on('dragend', (e) => {
             aid = null;
@@ -87,27 +109,31 @@
             line.setLatLngs(path);
         });
 
-        function switchMap() {
-            if (currentMap === 'OpenStreetMap') {
-                currentMap = 'MapboxSatellite';
-                L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-                    attribution: '',
-                    maxZoom: 18,
-                    id: 'mapbox/satellite-v9',
-                    tileSize: 512,
-                    zoomOffset: -1,
-                    accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA'
-                }).addTo(mymap);
-            } else {
-                currentMap = 'OpenStreetMap';
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '',
-                    maxZoom: 17,
-                    subdomains: "abc"
-                }).addTo(mymap);
-            }
-        }
-        document.getElementById('toggle-map').addEventListener('click', switchMap);
+        const baseMaps = {
+            "Open StreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 17,
+                subdomains: "abc"
+            }),
+            "Google Satellite": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            }),
+            "Mapbox Streets": L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                id: 'mapbox/streets-v11',
+                tileSize: 512,
+                zoomOffset: -1,
+                accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA',
+            }),
+            "Mapbox Dark": L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                id: 'mapbox/dark-v10',
+                tileSize: 512,
+                zoomOffset: -1,
+                accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA',
+            })
+        };
+
+        var scale = L.control.scale();
+        scale.addTo(mymap);
 
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: '',
@@ -118,23 +144,21 @@
             accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA'
         }).addTo(mymap);
 
+        const overlayMaps = {};
+
         fetch("map.json")
             .then(response => response.json())
             .then(data => {
                 localStorage.setItem("data", JSON.stringify(data.nodes));
-
                 let l = 0;
                 for (let k in data.nodes) l++;
-
-                document.getElementById('nodes').textContent = `${l} nodes in the map`;
-
                 let circles = [];
-
                 for (let key in data.nodes) {
                     if (data.nodes.hasOwnProperty(key)) circles.push(L.circle([data.nodes[key].lat, data.nodes[key].lon], { radius: 1 }));
                 }
-
                 let circlesLayer = L.layerGroup(circles);
+                overlayMaps[`${l} Nodes`] = circlesLayer;
+                L.control.layers(baseMaps, overlayMaps).addTo(mymap);
 
                 document.getElementById('toggle-nodes').addEventListener('click', () => {
                     if (mymap.hasLayer(circlesLayer)) {
@@ -148,14 +172,11 @@
 
         (() => {
             let data = JSON.parse(localStorage.getItem('data'));
-
             let circles = [];
             for (let key in data) {
                 if (data.hasOwnProperty(key)) circles.push(L.circle([data[key].lat, data[key].lon], { radius: 1 }));
             }
-
             let circlesLayer = L.layerGroup(circles);
-
             document.getElementById('toggle-nodes').addEventListener('click', () => {
                 if (mymap.hasLayer(circlesLayer)) {
                     mymap.removeLayer(circlesLayer);
@@ -164,6 +185,7 @@
                 }
             });
         })();
+
     </script>
 </body>
 

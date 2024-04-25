@@ -5,11 +5,11 @@ function nearestNeighbour(lat, lon) {
 
     for (let key in data) {
         let d = distance(lat, lon, data[key].lat, data[key].lon);
-        
+
         if (d < gd) {
             gd = d;
             id = key;
-        } 
+        }
     }
 
     return {
@@ -26,7 +26,7 @@ function astar(startId, goalId) {
         id: startId,
         cost: distance(data[startId].lat, data[startId].lon, data[goalId].lat, data[goalId].lon),
         path: 0,
-        parent:null,
+        parent: null,
         lat: data[startId].lat,
         lon: data[startId].lon
     }];
@@ -60,8 +60,6 @@ function astar(startId, goalId) {
             }
 
             if (queue.length > 0) {
-                // Prevent queue sort if nothing changed
-                // Not within the first 50 Iterations to not prevent a 'initial' sort
                 if (!changedQueue && iterations > 50) continue;
 
                 queue.sort((a, b) => {
@@ -72,7 +70,7 @@ function astar(startId, goalId) {
                     } else {
                         return 0;
                     }
-                });                
+                });
             } else {
                 return null;
             }
@@ -109,7 +107,7 @@ function getChildren(parent, goalId, data) {
 }
 
 function distance(lat1, lon1, lat2, lon2) {
-    let d1 = Math.abs(lat1 - lat2);
-    let d2 = Math.abs(lon1 - lon2);
-    return d1 + d2;
+    let d1 = Math.abs(lat1 - lat2) * Math.abs(lat1 - lat2);
+    let d2 = Math.abs(lon1 - lon2) * Math.abs(lon1 - lon2);
+    return Math.sqrt(d1 + d2);
 }

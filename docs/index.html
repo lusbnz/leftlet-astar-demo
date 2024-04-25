@@ -80,18 +80,18 @@
             }
 
             if (aid > 0 && bid > 0) {
+                a.setLatLng([0, 0]);
+                b.setLatLng([1, 1]);
                 line.setLatLngs([]);
+
                 let path = constructPath(astar(bid, aid));
                 renderPathIncrementally(path);
 
-                a.setLatLng([0, 0]);
-                b.setLatLng([1, 1]);
                 aid = -1;
                 bid = -1;
                 ab = true;
             }
         });
-
 
         a.on('dragend', (e) => {
             aid = null;
@@ -159,14 +159,6 @@
                 let circlesLayer = L.layerGroup(circles);
                 overlayMaps[`${l} Nodes`] = circlesLayer;
                 L.control.layers(baseMaps, overlayMaps).addTo(mymap);
-
-                document.getElementById('toggle-nodes').addEventListener('click', () => {
-                    if (mymap.hasLayer(circlesLayer)) {
-                        mymap.removeLayer(circlesLayer);
-                    } else {
-                        mymap.addLayer(circlesLayer);
-                    }
-                });
             });
 
 
@@ -177,13 +169,6 @@
                 if (data.hasOwnProperty(key)) circles.push(L.circle([data[key].lat, data[key].lon], { radius: 1 }));
             }
             let circlesLayer = L.layerGroup(circles);
-            document.getElementById('toggle-nodes').addEventListener('click', () => {
-                if (mymap.hasLayer(circlesLayer)) {
-                    mymap.removeLayer(circlesLayer);
-                } else {
-                    mymap.addLayer(circlesLayer);
-                }
-            });
         })();
 
     </script>

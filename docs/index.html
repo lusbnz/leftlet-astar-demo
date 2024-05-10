@@ -10,11 +10,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
         crossorigin="" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
         integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
         crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script src="a-star.js"></script>
 
@@ -45,12 +43,6 @@
         const b = L.marker([1, 1], { draggable: true }).addTo(mymap);
         let currentPath = [];
         let currentIndex = 0;
-
-        var geocoder = L.Control.Geocoder.mapbox('pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA');
-
-        var control = L.Control.geocoder({
-            geocoder: geocoder
-        }).addTo(mymap);
 
         function renderPathPartially() {
             if (currentIndex < currentPath.length) {
@@ -110,26 +102,16 @@
         });
 
         const baseMaps = {
-            "Open StreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17,
-                subdomains: "abc"
-            }),
-            "Google Satellite": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-            }),
             "Mapbox Streets": L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
                 id: 'mapbox/streets-v11',
                 tileSize: 512,
                 zoomOffset: -1,
                 accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA',
             }),
-            "Mapbox Dark": L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-                id: 'mapbox/dark-v10',
-                tileSize: 512,
-                zoomOffset: -1,
-                accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA',
-            })
+            "Google Satellite": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            }),
         };
 
         var scale = L.control.scale();

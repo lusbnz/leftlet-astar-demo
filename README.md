@@ -13,7 +13,3 @@
 - index.html hiển thị giao diện sử dụng leaflet và open street map
 
 ---
-
-mapcaugiay [21.04069, 105.78959]
-mapboston [42.3599990, -71.0600000]
-mapdailo [21.00, 105.75]

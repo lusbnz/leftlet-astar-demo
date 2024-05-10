@@ -82,6 +82,7 @@ function constructPath(node) {
     let path = [];
 
     while (node) {
+        console.log(node);
         path.push([node.lat, node.lon]);
         node = node.parent;
     }

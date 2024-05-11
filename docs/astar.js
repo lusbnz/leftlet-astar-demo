@@ -1,25 +1,3 @@
-function nearestNeighbour(lat, lon) {
-    let data = JSON.parse(localStorage.getItem('data'));
-    let id = "";
-    let gd = 99999999;
-
-    for (let key in data) {
-        let d = distance(lat, lon, data[key].lat, data[key].lon);
-
-        if (d < gd) {
-            gd = d;
-            id = key;
-        }
-    }
-
-    return {
-        id: id,
-        data: data[id],
-        lat: data[id].lat,
-        lng: data[id].lon
-    };
-};
-
 function astar(startId, goalId) {
     let data = JSON.parse(localStorage.getItem('data'));
     let queue = [{
@@ -34,21 +12,15 @@ function astar(startId, goalId) {
 
     let iterations = 0;
 
-    let nodes = Object.keys(data).length;
-
     while (true) {
-        if (++iterations > nodes) {
-            console.info('No path between the two selected nodes');
-            return null;
-        }
-
+        ++iterations;
         let current = queue.shift();
 
         if (current.id == goalId) {
             return current;
         } else {
             visited.add(current.id);
-            let children = getChildren(current, goalId, data);
+            let children = getChildrenAstar(current, goalId, data);
 
             let changedQueue = false;
 
@@ -78,19 +50,7 @@ function astar(startId, goalId) {
     }
 }
 
-function constructPath(node) {
-    let path = [];
-
-    while (node) {
-        console.log(node);
-        path.push([node.lat, node.lon]);
-        node = node.parent;
-    }
-
-    return path;
-}
-
-function getChildren(parent, goalId, data) {
+function getChildrenAstar(parent, goalId, data) {
     let children = [];
     for (let c of data[parent.id].con) {
         let path = parent.path + distance(parent.lat, parent.lon, data[c].lat, data[c].lon);
@@ -104,11 +64,6 @@ function getChildren(parent, goalId, data) {
             path: path
         });
     }
-    return children;
-}
 
-function distance(lat1, lon1, lat2, lon2) {
-    let d1 = Math.abs(lat1 - lat2) * Math.abs(lat1 - lat2);
-    let d2 = Math.abs(lon1 - lon2) * Math.abs(lon1 - lon2);
-    return Math.sqrt(d1 + d2);
+    return children;
 }

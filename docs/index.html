@@ -14,7 +14,9 @@
         integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
         crossorigin=""></script>
 
-    <script src="a-star.js"></script>
+    <script src="astar.js"></script>
+    <script src="greedy.js"></script>
+    <script src="common.js"></script>
 
     <style>
         * {
@@ -38,23 +40,36 @@
         let bid = -1;
         let currentMap = 'MapboxSatellite';
         const mymap = L.map('mapid').setView([21.04069, 105.78959], 16);
-        const line = L.polyline([], { color: 'red', weight: 5 }).addTo(mymap);
+        const lineA = L.polyline([], { color: 'red', weight: 3 }).addTo(mymap);
+        const lineG = L.polyline([], { color: 'blue', weight: 3 }).addTo(mymap);
         const a = L.marker([0, 0], { draggable: true }).addTo(mymap);
         const b = L.marker([1, 1], { draggable: true }).addTo(mymap);
-        let currentPath = [];
-        let currentIndex = 0;
+        let currentPathA = [];
+        let currentIndexA = 0;
+        let currentPathG = [];
+        let currentIndexG = 0;
 
         function renderPathPartially() {
-            if (currentIndex < currentPath.length) {
-                line.addLatLng(currentPath[currentIndex]);
-                currentIndex++;
-                setTimeout(renderPathPartially, 50);
+            if (currentIndexA < currentPathA.length) {
+                lineA.addLatLng(currentPathA[currentIndexA]);
+                currentIndexA++;
+                setTimeout(renderPathPartially, 500);
+            }
+            if (currentIndexG < currentPathG.length) {
+                const latlngG = currentPathG[currentIndexG];
+                const offset = 0.00005;
+                const latlngGOffset = L.latLng(latlngG[0] + offset, latlngG[1] + offset);
+                lineG.addLatLng(latlngGOffset);
+                currentIndexG++;
+                setTimeout(renderPathPartially, 500);
             }
         }
 
-        function renderPathIncrementally(path) {
-            currentPath = path;
-            currentIndex = 0;
+        function renderPathIncrementally(pathA, pathG) {
+            currentPathA = pathA;
+            currentIndexA = 0;
+            currentPathG = pathG;
+            currentIndexG = 0;
             renderPathPartially();
         }
 
@@ -74,10 +89,12 @@
             if (aid > 0 && bid > 0) {
                 a.setLatLng([0, 0]);
                 b.setLatLng([1, 1]);
-                line.setLatLngs([]);
+                lineA.setLatLngs([]);
+                lineG.setLatLngs([]);
 
-                let path = constructPath(astar(bid, aid));
-                renderPathIncrementally(path);
+                let pathA = constructPath(astar(bid, aid));
+                let pathG = constructPath(greedy(bid, aid));
+                renderPathIncrementally(pathA, pathG);
 
                 aid = -1;
                 bid = -1;
@@ -89,16 +106,20 @@
             aid = null;
             let nn = nearestNeighbour(e.target.getLatLng().lat, e.target.getLatLng().lng);
             aid = nn.id;
-            let path = constructPath(astar(aid, bid));
-            line.setLatLngs(path);
+            let pathA = constructPath(astar(aid, bid));
+            let pathG = constructPath(greedy(aid, bid));
+            lineA.setLatLngs(pathA);
+            lineG.setLatLngs(pathG);
         });
 
         b.on('dragend', (e) => {
             bid = null;
             let nn = nearestNeighbour(e.target.getLatLng().lat, e.target.getLatLng().lng);
             bid = nn.id;
-            let path = constructPath(astar(aid, bid));
-            line.setLatLngs(path);
+            let pathA = constructPath(astar(aid, bid));
+            let pathG = constructPath(greedy(aid, bid));
+            lineA.setLatLngs(pathA);
+            lineG.setLatLngs(pathG);
         });
 
         const baseMaps = {

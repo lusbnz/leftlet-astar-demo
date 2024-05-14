@@ -28,6 +28,8 @@ function constructPath(node) {
         node = node.parent;
     }
 
+    console.log('Path: ', path);
+
     return path;
 }
 

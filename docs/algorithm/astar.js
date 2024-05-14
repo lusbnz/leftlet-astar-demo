@@ -16,7 +16,7 @@ function astar(startId, goalId) {
         ++iterations;
         let current = queue.shift();
 
-        console.log(`Node ID: ${current.id}, Total Cost (f): ${current.cost}, Distance (g): ${current.path}, Manhattan (h): ${manhattan(current.lat, current.lon, data[goalId].lat, data[goalId].lon)}`);
+        console.log(`Node: ${current.id}, (${current.lat}, ${current.lon}), (f): ${current.cost}, (g): ${current.path}, (h): ${manhattan(current.lat, current.lon, data[goalId].lat, data[goalId].lon)}`);
 
         if (current.id == goalId) {
             return current;
@@ -59,7 +59,7 @@ function getChildrenAstar(parent, goalId, data) {
         let heuristic = manhattan(data[c].lat, data[c].lon, data[goalId].lat, data[goalId].lon);
         let totalCost = path + heuristic;
 
-        console.log(`Child Node ID: ${c}, Parent ID: ${parent.id}, Total Cost (f): ${totalCost}, Distance (g): ${path}, Manhattan (h): ${heuristic}`);
+        console.log(`Node: ${c}, Parent: ${parent.id}, (${data[c].lat}, ${data[c].lon}), (f): ${totalCost}, (g): ${path}, (h): ${heuristic}`);
 
         children.push({
             id: c,

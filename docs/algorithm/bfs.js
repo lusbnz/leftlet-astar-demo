@@ -18,12 +18,9 @@ function bfs(startId, goalId) {
             visited.add(current.id);
             let children = getChildrenBfs(current, data);
 
-            let changedQueue = false;
-
             for (let child of children) {
                 if (!visited.has(child.id)) {
                     queue.push(child);
-                    changedQueue = true;
                 }
             }
         }

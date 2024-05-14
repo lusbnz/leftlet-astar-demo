@@ -1,11 +1,11 @@
 let ab = true;
 let aid = -1;
 let bid = -1;
-let currentMap = 'MapboxSatellite';
-const mymap = L.map('mapid').setView([21.04069, 105.78959], 16);
+let currentMap = 'Google Satellite';
+const mymap = L.map('mapid').setView([21.00669, 105.84959], 15);
 const lineA = L.polyline([], { color: 'red', weight: 3 }).addTo(mymap);
-const lineB = L.polyline([], { color: 'yellow', weight: 3 }).addTo(mymap);
-const lineG = L.polyline([], { color: 'blue', weight: 3 }).addTo(mymap);
+const lineB = L.polyline([], { color: 'blue', weight: 3 }).addTo(mymap);
+const lineG = L.polyline([], { color: 'yellow', weight: 3 }).addTo(mymap);
 const a = L.marker([0, 0], { draggable: true }).addTo(mymap);
 const b = L.marker([1, 1], { draggable: true }).addTo(mymap);
 let currentPathA = [];
@@ -16,25 +16,25 @@ let currentPathG = [];
 let currentIndexG = 0;
 
 function renderPathPartially() {
-    const offset = 0.00005;
+    const offset = 0.00003;
     if (currentIndexA < currentPathA.length) {
         lineA.addLatLng(currentPathA[currentIndexA]);
         currentIndexA++;
-        setTimeout(renderPathPartially, 1000);
+        setTimeout(renderPathPartially, 100);
     }
     if (currentIndexB < currentPathB.length) {
         const latlngB = currentPathB[currentIndexB];
         const latlngBOffset = L.latLng(latlngB[0] + offset, latlngB[1] + offset);
         lineB.addLatLng(latlngBOffset);
         currentIndexB++;
-        setTimeout(renderPathPartially, 1000);
+        setTimeout(renderPathPartially, 100);
     }
     if (currentIndexG < currentPathG.length) {
         const latlngG = currentPathG[currentIndexG];
         const latlngGOffset = L.latLng(latlngG[0] - offset, latlngG[1] - offset);
         lineG.addLatLng(latlngGOffset);
         currentIndexG++;
-        setTimeout(renderPathPartially, 1000);
+        setTimeout(renderPathPartially, 100);
     }
 }
 
@@ -62,8 +62,8 @@ mymap.on('click', (e) => {
     }
 
     if (aid > 0 && bid > 0) {
-        a.setLatLng([0, 0]);
-        b.setLatLng([1, 1]);
+        // a.setLatLng([0, 0]);
+        // b.setLatLng([1, 1]);
         lineA.setLatLngs([]);
         lineB.setLatLngs([]);
         lineG.setLatLngs([]);
@@ -104,11 +104,8 @@ b.on('dragend', (e) => {
 });
 
 const baseMaps = {
-    "Mapbox Streets": L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-        id: 'mapbox/streets-v11',
-        tileSize: 512,
-        zoomOffset: -1,
-        accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA',
+    "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 20,
     }),
     "Google Satellite": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
         maxZoom: 20,
@@ -119,13 +116,9 @@ const baseMaps = {
 var scale = L.control.scale();
 scale.addTo(mymap);
 
-L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-    attribution: '',
-    maxZoom: 18,
-    id: 'mapbox/satellite-v9',
-    tileSize: 512,
-    zoomOffset: -1,
-    accessToken: 'pk.eyJ1IjoibHVzYm56IiwiYSI6ImNsdmFrNXBnMTAyNTEyam9hZjFrbzdpMDIifQ.o5QtaKWJIihmYEktn9XrZA'
+L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
 }).addTo(mymap);
 
 const overlayMaps = {};

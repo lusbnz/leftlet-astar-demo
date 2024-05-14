@@ -36,3 +36,9 @@ function distance(lat1, lon1, lat2, lon2) {
     let d2 = Math.abs(lon1 - lon2) * Math.abs(lon1 - lon2);
     return Math.sqrt(d1 + d2);
 }
+
+function manhattan(lat1, lon1, lat2, lon2) {
+    let d1 = Math.abs(lat1 - lat2);
+    let d2 = Math.abs(lon1 - lon2);
+    return Math.abs(d1 + d2);
+}

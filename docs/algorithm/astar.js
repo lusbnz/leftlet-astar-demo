@@ -2,11 +2,11 @@ function astar(startId, goalId) {
     let data = JSON.parse(localStorage.getItem('data'));
     let queue = [{
         id: startId,
-        cost: distance(data[startId].lat, data[startId].lon, data[goalId].lat, data[goalId].lon),
+        cost: manhattan(data[startId].lat, data[startId].lon, data[goalId].lat, data[goalId].lon),
         path: 0,
         parent: null,
         lat: data[startId].lat,
-        lon: data[startId].lon
+        lon: data[startId].lon,
     }];
     let visited = new Set();
 
@@ -15,6 +15,8 @@ function astar(startId, goalId) {
     while (true) {
         ++iterations;
         let current = queue.shift();
+
+        console.log(`Node ID: ${current.id}, Total Cost (f): ${current.cost}, Distance (g): ${current.path}, Manhattan (h): ${manhattan(current.lat, current.lon, data[goalId].lat, data[goalId].lon)}`);
 
         if (current.id == goalId) {
             return current;
@@ -54,14 +56,18 @@ function getChildrenAstar(parent, goalId, data) {
     let children = [];
     for (let c of data[parent.id].con) {
         let path = parent.path + distance(parent.lat, parent.lon, data[c].lat, data[c].lon);
+        let heuristic = manhattan(data[c].lat, data[c].lon, data[goalId].lat, data[goalId].lon);
+        let totalCost = path + heuristic;
+
+        console.log(`Child Node ID: ${c}, Parent ID: ${parent.id}, Total Cost (f): ${totalCost}, Distance (g): ${path}, Manhattan (h): ${heuristic}`);
 
         children.push({
             id: c,
             lat: data[c].lat,
             lon: data[c].lon,
             parent: parent,
-            cost: path + distance(data[c].lat, data[c].lon, data[goalId].lat, data[goalId].lon),
-            path: path
+            cost: totalCost,
+            path: path,
         });
     }
 

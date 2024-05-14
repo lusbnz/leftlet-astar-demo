@@ -53,7 +53,7 @@ function greedy(startId, goalId) {
 function getChildrenGreedy(parent, goalId, data) {
     let children = [];
     for (let c of data[parent.id].con) {
-        let path = parent.path + manhattan(data[c].lat, data[c].lon, data[goalId].lat, data[goalId].lon);
+        let path = manhattan(data[c].lat, data[c].lon, data[goalId].lat, data[goalId].lon);
 
         children.push({
             id: c,

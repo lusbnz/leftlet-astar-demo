@@ -20,15 +20,19 @@ function nearestNeighbour(lat, lon) {
     };
 };
 
-function constructPath(node) {
+function constructPath(node, isAStar) {
     let path = [];
+    let pathFull = [];
 
     while (node) {
         path.push([node.lat, node.lon]);
+        pathFull.push([node.id, node.lat, node.lon]);
         node = node.parent;
     }
-
-    console.log('Path: ', path);
+    {
+        isAStar &&
+            console.log('Path Astar: ', pathFull);
+    }
 
     return path;
 }

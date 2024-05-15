@@ -20,18 +20,22 @@ function nearestNeighbour(lat, lon) {
     };
 };
 
-function constructPath(node, isAStar) {
+function constructPath(node, algo) {
     let path = [];
     let pathFull = [];
-
+    let to_compare = 0;
     while (node) {
         path.push([node.lat, node.lon]);
         pathFull.push([node.id, node.lat, node.lon]);
         node = node.parent;
     }
+    for (let i = 0; i < pathFull.length - 1; i++) {
+        to_compare = to_compare + distance(pathFull[i][1], pathFull[i][2], pathFull[i + 1][1], pathFull[i + 1][2]);
+    }
+    console.log(`Distance ${algo}: `, to_compare);
     {
-        isAStar &&
-            console.log('Path Astar: ', pathFull);
+        algo === 'Astar' &&
+            console.log('Path Astar: ', pathFull.reverse());
     }
 
     return path;

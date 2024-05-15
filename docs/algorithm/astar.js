@@ -7,6 +7,7 @@ function astar(startId, goalId) {
         parent: null,
         lat: data[startId].lat,
         lon: data[startId].lon,
+        heuristic: 0,
     }];
     let visited = new Set();
     let logArray = [];
@@ -16,22 +17,11 @@ function astar(startId, goalId) {
         ++iterations;
         let current = queue.shift();
 
-        logArray.push({
-            id: current.id,
-            lat: current.lat,
-            lon: current.lon,
-            f: current.cost,
-            g: current.path,
-            h: manhattan(current.lat, current.lon, data[goalId].lat, data[goalId].lon)
-        });
-
         if (current.id == goalId) {
-            console.log("Total Cost Astar:", current.cost);
-            console.log(logArray);
             return current;
         } else {
             visited.add(current.id);
-            let children = getChildrenAstar(current, goalId, data, logArray);
+            let children = getChildrenAstar(current, goalId, data);
 
             let changedQueue = false;
 
@@ -55,29 +45,18 @@ function astar(startId, goalId) {
                     }
                 });
             } else {
-                console.log(logArray);
                 return null;
             }
         }
     }
 }
 
-function getChildrenAstar(parent, goalId, data, logArray) {
+function getChildrenAstar(parent, goalId, data) {
     let children = [];
     for (let c of data[parent.id].con) {
         let path = parent.path + distance(parent.lat, parent.lon, data[c].lat, data[c].lon);
         let heuristic = manhattan(data[c].lat, data[c].lon, data[goalId].lat, data[goalId].lon);
         let totalCost = path + heuristic;
-
-        logArray.push({
-            id: c,
-            parent: parent.id,
-            lat: data[c].lat,
-            lon: data[c].lon,
-            f: totalCost,
-            g: path,
-            h: heuristic
-        });
 
         children.push({
             id: c,
@@ -86,6 +65,7 @@ function getChildrenAstar(parent, goalId, data, logArray) {
             parent: parent,
             cost: totalCost,
             path: path,
+            heuristic: heuristic,
         });
     }
 

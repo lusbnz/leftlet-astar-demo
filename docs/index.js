@@ -2,10 +2,10 @@ let ab = true;
 let aid = -1;
 let bid = -1;
 let currentMap = 'Google Satellite';
-const mymap = L.map('mapid').setView([21.00669, 105.84959], 15);
-const lineA = L.polyline([], { color: 'red', weight: 3 }).addTo(mymap);
-const lineB = L.polyline([], { color: 'blue', weight: 3 }).addTo(mymap);
-const lineG = L.polyline([], { color: 'yellow', weight: 3 }).addTo(mymap);
+const mymap = L.map('mapid').setView([21.00269, 105.85159], 16);
+const lineA = L.polyline([], { color: 'red', weight: 4 }).addTo(mymap);
+const lineB = L.polyline([], { color: 'blue', weight: 4 }).addTo(mymap);
+const lineG = L.polyline([], { color: 'yellow', weight: 4 }).addTo(mymap);
 const a = L.marker([0, 0], { draggable: true }).addTo(mymap);
 const b = L.marker([1, 1], { draggable: true }).addTo(mymap);
 let currentPathA = [];
@@ -67,10 +67,9 @@ mymap.on('click', (e) => {
         lineA.setLatLngs([]);
         lineB.setLatLngs([]);
         lineG.setLatLngs([]);
-
-        let pathA = constructPath(astar(aid, bid), true);
-        let pathB = constructPath(bfs(aid, bid), false);
-        let pathG = constructPath(greedy(aid, bid), false);
+        let pathA = constructPath(astar(aid, bid), 'Astar');
+        let pathB = constructPath(bfs(aid, bid), 'BFS');
+        let pathG = constructPath(greedy(aid, bid), 'Greedy');
         renderPathIncrementally(pathA, pathB, pathG);
 
         aid = -1;
@@ -83,9 +82,9 @@ a.on('dragend', (e) => {
     aid = null;
     let nn = nearestNeighbour(e.target.getLatLng().lat, e.target.getLatLng().lng);
     aid = nn.id;
-    let pathA = constructPath(astar(aid, bid), true);
-    let pathB = constructPath(bfs(aid, bid), false);
-    let pathG = constructPath(greedy(aid, bid), false);
+    let pathA = constructPath(astar(aid, bid), 'Astar');
+    let pathB = constructPath(bfs(aid, bid), 'BFS');
+    let pathG = constructPath(greedy(aid, bid), 'Greedy');
     lineA.setLatLngs(pathA);
     lineB.setLatLngs(pathB);
     lineG.setLatLngs(pathG);
@@ -95,9 +94,9 @@ b.on('dragend', (e) => {
     bid = null;
     let nn = nearestNeighbour(e.target.getLatLng().lat, e.target.getLatLng().lng);
     bid = nn.id;
-    let pathA = constructPath(astar(aid, bid), true);
-    let pathB = constructPath(bfs(aid, bid), false);
-    let pathG = constructPath(greedy(aid, bid), false);
+    let pathA = constructPath(astar(aid, bid), 'Astar');
+    let pathB = constructPath(bfs(aid, bid), 'BFS');
+    let pathG = constructPath(greedy(aid, bid), 'Greedy');
     lineA.setLatLngs(pathA);
     lineB.setLatLngs(pathB);
     lineG.setLatLngs(pathG);

@@ -10,20 +10,30 @@ function astar(startId, goalId) {
         heuristic: 0,
     }];
     let visited = new Set();
-    let logArray = [];
+    let nodesArray = [];
     let iterations = 0;
 
     while (true) {
         ++iterations;
         let current = queue.shift();
 
+        nodesArray.push({
+            id: current.id,
+            lat: current.lat,
+            lon: current.lon,
+            cost: current.cost,
+            path: current.path,
+            heuristic: manhattan(current.lat, current.lon, data[goalId].lat, data[goalId].lon)
+        });
+
         if (current.id == goalId) {
+            console.log('Node children: ', nodesArray);
             return current;
         } else {
             visited.add(current.id);
             let children = getChildrenAstar(current, goalId, data);
-
             let changedQueue = false;
+            nodesArray.push(children)
 
             for (let child of children) {
                 if (!visited.has(child.id)) {

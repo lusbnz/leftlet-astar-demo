@@ -1,7 +1,7 @@
 let ab = true;
 let aid = -1;
 let bid = -1;
-let currentMap = 'Google Satellite';
+let currentMap = 'OpenStreetMap';
 const mymap = L.map('mapid').setView([21.00269, 105.85159], 16);
 const lineB = L.polyline([], { color: 'blue', weight: 3 }).addTo(mymap);
 const lineG = L.polyline([], { color: 'yellow', weight: 3 }).addTo(mymap);
@@ -20,21 +20,21 @@ function renderPathPartially() {
     if (currentIndexA < currentPathA.length) {
         lineA.addLatLng(currentPathA[currentIndexA]);
         currentIndexA++;
-        setTimeout(renderPathPartially, 100);
+        setTimeout(renderPathPartially, 200);
     }
     if (currentIndexB < currentPathB.length) {
         const latlngB = currentPathB[currentIndexB];
         const latlngBOffset = L.latLng(latlngB[0] + offset, latlngB[1] + offset);
         lineB.addLatLng(latlngBOffset);
         currentIndexB++;
-        setTimeout(renderPathPartially, 100);
+        setTimeout(renderPathPartially, 200);
     }
     if (currentIndexG < currentPathG.length) {
         const latlngG = currentPathG[currentIndexG];
         const latlngGOffset = L.latLng(latlngG[0] - offset, latlngG[1] - offset);
         lineG.addLatLng(latlngGOffset);
         currentIndexG++;
-        setTimeout(renderPathPartially, 100);
+        setTimeout(renderPathPartially, 200);
     }
 }
 
@@ -115,9 +115,8 @@ const baseMaps = {
 var scale = L.control.scale();
 scale.addTo(mymap);
 
-L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 20,
-    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
 }).addTo(mymap);
 
 const overlayMaps = {};
